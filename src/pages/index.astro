@@ -3,8 +3,10 @@ import "../styles/global.css";
 import Game from '../components/Game.astro';
 import Display from '../components/Display.astro';
 import Controls from '../components/Controls.astro';
+import Intro from '../components/Intro.astro';
 ---
 
+<Intro />
 <Game>
   <Display slot="display" />
   <Controls slot="controls" />

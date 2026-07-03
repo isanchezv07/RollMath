@@ -1,7 +1,7 @@
 ---
 ---
 
-<div class="relative h-screen w-screen overflow-hidden bg-zinc-950">
+<div class="relative h-[100dvh] w-screen overflow-hidden bg-zinc-950">
     <canvas
         id="world"
         class="absolute inset-0 h-full w-full touch-none"
@@ -10,7 +10,7 @@
     <div class="pointer-events-none absolute top-0 left-0 z-20 w-full">
         <slot name="display" />
     </div>
-    <div class="absolute bottom-6 left-1/2 z-20 flex -translate-x-1/2 gap-3">
+    <div class="absolute bottom-8 left-1/2 z-20 flex -translate-x-1/2 gap-3 pb-[env(safe-area-inset-bottom)]">
         <slot name="controls" />
     </div>
 </div>
@@ -20,19 +20,21 @@
 
     const canvas = document.getElementById("world");
     if (canvas) {
-        const engine = new MatterEngine(canvas);
+        const engine = new MatterEngine(canvas as HTMLCanvasElement);
         engine.start();
 
         const spawnBtn = document.getElementById("spawn");
         if(spawnBtn) {
-            spawnBtn.addEventListener("click", ()=>{
+            spawnBtn.addEventListener("click", async ()=>{
+                await engine.gyro.start();
                 engine.spawnBall();
             });
         }
 
         const miniBtn = document.getElementById("mini");
         if(miniBtn) {
-            miniBtn.addEventListener("click", ()=>{
+            miniBtn.addEventListener("click", async ()=>{
+                await engine.gyro.start();
                 engine.spawnMiniBall();
             });
         }

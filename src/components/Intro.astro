@@ -1,0 +1,39 @@
+---
+---
+
+<div id="intro-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4 backdrop-blur-sm transition-opacity duration-300">
+  <div class="max-w-md rounded-2xl border border-white/20 bg-zinc-900 p-8 shadow-2xl text-white">
+    <h1 class="mb-4 text-3xl font-bold text-blue-400">Welcome to Ball Calculator!</h1>
+    
+    <div class="space-y-4 text-zinc-300">
+      <p>
+        <strong>1. Spawn a ball:</strong> Tap the big blue <span class="font-bold text-blue-400">+</span> button for a normal ball, or the red <span class="font-bold text-red-500">+</span> button for an eraser ball.
+      </p>
+      <p>
+        <strong>2. Control Gravity:</strong> 
+        <br>- On mobile: Tilt your phone to roll the ball!
+      </p>
+      <p>
+        <strong>3. Calculate:</strong> Drop the normal ball into numbers and operators to build your math expression. Use the small red ball in the <strong>C</strong> hole to clear!
+      </p>
+    </div>
+
+    <button id="start-game-btn" class="mt-8 w-full rounded-xl bg-blue-600 py-3 text-lg font-bold text-white transition hover:bg-blue-500 hover:scale-105 active:scale-95">
+      Got it, let's play!
+    </button>
+  </div>
+</div>
+
+<script>
+  const startBtn = document.getElementById("start-game-btn");
+  const modal = document.getElementById("intro-modal");
+
+  if (startBtn && modal) {
+    startBtn.addEventListener("click", () => {
+      modal.style.opacity = "0";
+      setTimeout(() => {
+        modal.style.display = "none";
+      }, 300);
+    });
+  }
+</script>

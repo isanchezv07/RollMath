@@ -69,8 +69,6 @@ import {
         this.holes.map(hole => hole.body)
       );
   
-      await this.gyro.start();
-  
       Render.run(this.render);
   
       Runner.run(this.runner, this.engine);

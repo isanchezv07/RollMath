@@ -1,43 +1,51 @@
-# Astro Starter Kit: Minimal
+# Ball Calculator 
 
-```sh
-npm create astro@latest -- --template minimal
-```
+Welcome to **Ball Calculator** — an interactive, physics-based calculator built with Astro, Tailwind CSS, and Matter.js. 
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+Instead of typing on a boring keypad, you spawn balls and use your device's **gyroscope** (or your finger!) to guide them into holes representing numbers and mathematical operators. 
 
-## 🚀 Project Structure
+## How to Play
 
-Inside of your Astro project, you'll see the following folders and files:
+1. **Spawn a Ball:** 
+   - Tap the large **`+`** button to spawn a **Normal Ball**. 
+   - Tap the small **`+`** button to spawn a **Mini Ball**.
+2. **Move the Ball:** 
+   - **Mobile Devices (HTTPS):** Tilt your phone! The ball will realistically roll across the screen based on the gravity sensed by your device's gyroscope.
+   - **Desktop or HTTP local testing:** Drag your finger or mouse across the screen to manually tilt the gravity towards your touch.
+3. **Calculate:** 
+   - Guide the **Normal Ball** into any hole (numbers `0-9`, operators `+`, `-`, `*`, `/`, or `=`) to build your mathematical expression. The result will instantly show up on the floating display.
+   - The **Mini Ball** is a special eraser. Guide it into the **`C`** (Clear) hole to reset the calculator and start a new operation. (It ignores all other holes).
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
+## Technologies Used
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+- **Framework:** [Astro](https://astro.build/)
+- **Physics Engine:** [Matter.js](https://brm.io/matter-js/)
+- **Styling:** [Tailwind CSS v4](https://tailwindcss.com/)
+- **Language:** TypeScript
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+## Development Setup
 
-Any static assets, like images, can be placed in the `public/` directory.
+If you want to run this project locally, make sure you have Node.js installed.
 
-## 🧞 Commands
+1. **Install Dependencies:**
+   ```bash
+   npm install
+   ```
 
-All commands are run from the root of the project, from a terminal:
+2. **Start the Development Server:**
+   ```bash
+   npm run dev
+   ```
+   *Note: Astro will run on `localhost:4321` by default.*
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+3. **Build for Production:**
+   ```bash
+   npm run build
+   ```
 
-## 👀 Want to learn more?
+### A Note on Mobile Testing (Gyroscope)
+Modern browsers like iOS Safari and Android Chrome block access to the gyroscope (`DeviceOrientationEvent`) unless the site is served over a secure **HTTPS** connection (or `localhost`). 
+If you are testing on your phone over your local network (e.g., `http://X.X.X.X:XXXX`), the gyroscope will be blocked. Don't worry! We've implemented a **touch fallback**. Simply swipe and drag your finger across the screen to control gravity during local development. Once deployed to a secure HTTPS domain, the gyroscope will activate automatically!
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+## License
+MIT
