@@ -9,7 +9,7 @@ import {
     type Engine as MatterEngineType,
     type Render as MatterRender,
     type Runner as MatterRunner,
-    type Body as MatterBody,
+    Body as MatterBody,
   } from "matter-js";
   
   import Ball from "../components/Ball";
@@ -17,6 +17,8 @@ import {
   import Board from "../components/Board";
   import Gyroscope from "./Gyroscope";
   import Calculator from "./Calculator";
+  import { type LevelManager } from "./LevelManager";
+  import { gameBus } from "./GameEventBus";
   
   export default class MatterEngine {
     engine: MatterEngineType;
@@ -29,12 +31,14 @@ import {
     board!: Board;
     gyro: Gyroscope;
     calculator: Calculator;
+    levelManager: LevelManager;
   
     balls: Ball[] = [];
     holes: Hole[] = [];
   
-    constructor(canvas: HTMLCanvasElement) {
+    constructor(canvas: HTMLCanvasElement, levelManager: LevelManager) {
       this.canvas = canvas;
+      this.levelManager = levelManager;
   
       this.engine = Engine.create();
   
@@ -61,13 +65,7 @@ import {
     async start() {
       this.createWalls();
   
-      this.board = new Board();
-  
-      this.holes = this.board.holes;
-      World.add(
-        this.world,
-        this.holes.map(hole => hole.body)
-      );
+      this.loadLevel();
   
       Render.run(this.render);
   
@@ -75,6 +73,27 @@ import {
   
       this.loop();
   
+      Events.on(this.engine, "beforeUpdate", () => {
+        if (!this.board) return;
+        
+        for (const spinner of this.board.spinners) {
+            MatterBody.setAngle(spinner.body, spinner.body.angle + spinner.speed);
+        }
+        
+        for (const fan of this.board.fans) {
+            for (const ball of this.balls) {
+                const dx = ball.body.position.x - fan.body.position.x;
+                const dy = ball.body.position.y - fan.body.position.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 200) {
+                    const forceX = Math.cos(fan.angle) * fan.speed * 0.005;
+                    const forceY = Math.sin(fan.angle) * fan.speed * 0.005;
+                    MatterBody.applyForce(ball.body, ball.body.position, { x: forceX, y: forceY });
+                }
+            }
+        }
+      });
+
       Events.on(this.engine, "collisionStart", (event) => {
         this.handleCollision(event.pairs);
       });
@@ -92,6 +111,22 @@ import {
 
         for (const hole of this.holes) {
           ctx.fillText(hole.value, hole.x, hole.y - yOffset);
+        }
+      });
+
+      document.addEventListener("click", (e) => {
+        const target = e.target as HTMLElement;
+        if (target && target.closest("#next-level-btn")) {
+            try {
+                document.getElementById("level-complete-modal")?.classList.add("hidden");
+                if(this.levelManager.next()) {
+                    this.loadLevel();
+                } else {
+                    alert("Game Complete!");
+                }
+            } catch (err: any) {
+                alert("Error loading next level: " + err.message);
+            }
         }
       });
     }
@@ -129,15 +164,7 @@ import {
       World.add(this.world, ball.body);
       this.balls.push(ball);
     }
-  
-    private createBoard() {
-      this.holes = this.board.holes;
-  
-      for (const hole of this.holes) {
-        World.add(this.world, hole.sensor);
-      }
-    }
-  
+
     private createWalls() {
       const w = window.innerWidth;
       const h = window.innerHeight;
@@ -151,6 +178,35 @@ import {
       ];
 
       World.add(this.world, walls);
+    }
+
+    public loadLevel() {
+      if (this.board) {
+        World.remove(this.world, this.holes.map(h => h.body));
+        World.remove(this.world, this.board.obstacles);
+      }
+      
+      this.calculator.clear();
+      this.updateDisplay();
+
+      const currentLevel = this.levelManager.current;
+      this.board = new Board(currentLevel.entities);
+
+      this.holes = this.board.holes;
+      World.add(this.world, this.holes.map(hole => hole.body));
+      World.add(this.world, this.board.obstacles);
+
+      this.updateProgressUI();
+    }
+
+    private updateProgressUI() {
+      const currentLevel = this.levelManager.current;
+      gameBus.emit("ui:updateProgress", {
+        current: this.levelManager.progress,
+        goal: currentLevel.goal,
+        name: currentLevel.name,
+        description: currentLevel.description
+      });
     }
 
     private updateDisplay(){
@@ -191,10 +247,21 @@ import {
       if (isMiniBall && value !== "C") {
           return;
       }
+      
+      if (!isMiniBall && value === "C") {
+          return;
+      }
 
       switch(value){
         case "=":
-          this.calculator.solve();
+          const res = this.calculator.solve();
+          if (res !== "Error" && res !== "") {
+            this.levelManager.addProgress();
+            this.updateProgressUI();
+            if (this.levelManager.isLevelComplete()) {
+              gameBus.emit("ui:levelComplete", undefined as void);
+            }
+          }
           break;
         case "C":
           this.calculator.clear();

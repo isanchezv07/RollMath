@@ -1,7 +1,7 @@
 ---
 ---
 
-<div class="relative h-[100dvh] w-screen overflow-hidden bg-zinc-950">
+<div class="relative h-dvh w-screen overflow-hidden bg-zinc-950">
     <canvas
         id="world"
         class="absolute inset-0 h-full w-full touch-none"
@@ -17,10 +17,17 @@
 
 <script>
     import MatterEngine from "../lib/MatterEngine";
+    import { LevelManager } from "../lib/LevelManager";
+    import { level1 } from "../levels/level1";
+    import { level2 } from "../levels/level2";
+    import { level3 } from "../levels/level3";
+    import { level4 } from "../levels/level4";
+    import { gameBus } from "../lib/GameEventBus";
 
     const canvas = document.getElementById("world");
     if (canvas) {
-        const engine = new MatterEngine(canvas as HTMLCanvasElement);
+        const levelManager = new LevelManager([level1, level2, level3, level4]);
+        const engine = new MatterEngine(canvas as HTMLCanvasElement, levelManager);
         engine.start();
 
         const spawnBtn = document.getElementById("spawn");

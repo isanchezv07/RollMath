@@ -2,10 +2,56 @@
 
 ---
 
-<div class="pointer-events-none absolute left-1/2 top-8 z-50 -translate-x-1/2 w-[90%] max-w-[320px] sm:w-auto">
-  <div class="min-w-full sm:min-w-[320px] rounded-3xl border border-white/10 bg-zinc-900/80 px-4 sm:px-8 py-3 sm:py-5 shadow-2xl backdrop-blur-xl">
-    <p id="calculator-display" class="text-right font-mono text-3xl sm:text-5xl font-bold tracking-wider text-white break-all">
-      0
-    </p>
+<div class="fixed top-0 left-0 w-full p-4 flex justify-between items-center bg-slate-900/80 backdrop-blur-md text-white font-mono z-50">
+  <div>
+    <h2 id="level-name" class="text-xl font-bold text-emerald-400">Loading...</h2>
+    <p id="level-desc" class="text-xs text-slate-400 max-w-sm"></p>
+  </div>
+
+  <div class="flex flex-col items-end">
+    <div class="text-sm font-semibold mb-1">
+      Calculated: <span id="calculator-display" class="text-amber-400">0</span>
+    </div>
+    <div class="w-48 bg-slate-700 h-3 rounded-full overflow-hidden relative">
+      <div id="level-bar" class="bg-emerald-500 h-full w-0 transition-all duration-300"></div>
+    </div>
+    <span id="level-progress" class="text-x text-slate-400 mt-1">0 / 0</span>
   </div>
 </div>
+
+<div id="level-complete-modal" class="pointer-events-auto fixed inset-0 bg-black/70 flex items-center justify-center hidden z-50">
+  <div class="bg-slate-800 p-8 rounded-xl max-w-md text-center border border-emerald-500">
+    <h3 class="text-3xl font-black text-emerald-400 mb-2">LEVEL CLEARED!</h3>
+    <p class="text-slate-300 mb-6">Excellent structural execution.</p>
+    <button id="next-level-btn" class="px-6 py-3 bg-emerald-500 text-slate-950 font-bold rounded-lg hover:bg-emerald-400">
+      Advance Configuration
+    </button>
+  </div>
+</div>
+
+<script>
+  import { gameBus } from "../lib/GameEventBus";
+
+  const levelName = document.getElementById("level-name")!;
+  const levelDesc = document.getElementById("level-desc")!;
+  const levelBar = document.getElementById("level-bar")!;
+  const levelProgress = document.getElementById("level-progress")!;
+  const calcDisplay = document.getElementById("calculator-display")!;
+  const completeModal = document.getElementById("level-complete-modal")!;
+
+  gameBus.on("ui:updateDisplay", (data) => {
+    calcDisplay.textContent = data.text;
+  });
+
+  gameBus.on("ui:updateProgress", (data) => {
+    levelName.textContent = data.name;
+    levelDesc.textContent = data.description || "";
+    levelProgress.textContent = `${data.current} / ${data.goal}`;
+    (levelBar as HTMLDivElement).style.width = `${(data.current / data.goal) * 100}%`;
+  });
+
+  gameBus.on("ui:levelComplete", () => {
+    completeModal.classList.remove("hidden");
+  });
+
+</script>
