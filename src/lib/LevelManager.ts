@@ -1,49 +1,26 @@
 import type { LevelConfig } from "../levels/types";
 
 export class LevelManager {
-    private levels: LevelConfig[];
-    private currentIndex: number = 0;
-    private currentProgress: number = 0;
+    currentId = 1;
+    progress = 0;
 
-    constructor(levels: LevelConfig[]){
-        this.levels = levels;
+    get current() {
+        return {
+            id: this.currentId
+        };
     }
 
-    public get current(): LevelConfig {
-        return this.levels[this.currentIndex];
+    addProgress() {
+        this.progress++;
     }
 
-    public get progress(): number {
-        return this.currentProgress;
+    isLevelComplete(goal: number) {
+        return this.progress >= goal;
     }
 
-    public addProgress(){
-        this.currentProgress++;
-    }
-
-    public resetProgress(){
-        this.currentProgress = 0;
-    }
-
-    public isLevelComplete(): boolean {
-        return this.currentProgress >= this.current.goal;
-    }
-
-    public next(): boolean {
-        if(this.currentIndex < this.levels.length - 1){
-            this.currentIndex++;
-            this.resetProgress();
-            return true;
-        }
-        return false;
-    }
-
-    public previous(): boolean {
-        if(this.currentIndex > 0){
-            this.currentIndex--;
-            this.resetProgress();
-            return true;
-        }
-        return false;
+    next() {
+        this.currentId++;
+        this.progress = 0;
+        return true;
     }
 }

@@ -1,30 +1,42 @@
 ---
-
 ---
 
-<div class="fixed top-0 left-0 w-full p-4 flex justify-between items-center bg-slate-900/80 backdrop-blur-md text-white font-mono z-50">
-  <div>
-    <h2 id="level-name" class="text-xl font-bold text-emerald-400">Loading...</h2>
-    <p id="level-desc" class="text-xs text-slate-400 max-w-sm"></p>
-  </div>
+<div class="absolute top-4 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-lg bg-slate-950 border-2 border-slate-800 rounded-lg p-3 font-mono shadow-2xl z-40">
+  <div class="bg-slate-900 border border-slate-950 rounded p-3 shadow-inner flex flex-col gap-2">
+    
+    <div class="flex justify-between items-center text-[10px] uppercase tracking-widest text-slate-500 border-b border-slate-800/50 pb-1.5">
+      <span id="level-name">LOADING...</span>
+      <span id="level-progress">00 / 00</span>
+    </div>
 
-  <div class="flex flex-col items-end">
-    <div class="text-sm font-semibold mb-1">
-      Calculated: <span id="calculator-display" class="text-amber-400">0</span>
+    <div class="bg-slate-950/80 rounded px-3 py-2 border border-slate-900 flex flex-col items-center justify-center min-h-[64px] relative overflow-hidden">
+      <div class="absolute inset-0 bg-linear-to-b from-transparent to-black/10 pointer-events-none bg-size-[100%_4px]"></div>
+      
+      <div class="text-3xl font-black tracking-tight text-amber-400 font-sans tabular-nums">
+        <span id="calculator-display">0</span>
+      </div>
+      
+      <div id="level-desc" class="text-[11px] text-slate-400 mt-1 max-w-xs text-center truncate"></div>
     </div>
-    <div class="w-48 bg-slate-700 h-3 rounded-full overflow-hidden relative">
-      <div id="level-bar" class="bg-emerald-500 h-full w-0 transition-all duration-300"></div>
+
+    <div class="flex items-center gap-2 mt-1">
+      <span class="text-[10px] text-slate-500 font-bold">PRG:</span>
+      <div class="flex-1 bg-slate-950 h-3 border border-slate-800 rounded-sm p-[2px] overflow-hidden">
+        <div id="level-bar" class="bg-emerald-500 h-full w-0 transition-all duration-300 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+      </div>
     </div>
-    <span id="level-progress" class="text-x text-slate-400 mt-1">0 / 0</span>
+
   </div>
 </div>
 
-<div id="level-complete-modal" class="pointer-events-auto fixed inset-0 bg-black/70 flex items-center justify-center hidden z-50">
-  <div class="bg-slate-800 p-8 rounded-xl max-w-md text-center border border-emerald-500">
-    <h3 class="text-3xl font-black text-emerald-400 mb-2">LEVEL CLEARED!</h3>
-    <p class="text-slate-300 mb-6">Excellent structural execution.</p>
-    <button id="next-level-btn" class="px-6 py-3 bg-emerald-500 text-slate-950 font-bold rounded-lg hover:bg-emerald-400">
-      Advance Configuration
+<div id="level-complete-modal" class="pointer-events-auto fixed inset-0 bg-black/80 flex items-center justify-center hidden z-50 backdrop-blur-xs animate-fade-in">
+  <div class="bg-slate-900 p-6 rounded-lg max-w-sm w-full text-center border-2 border-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.3)] font-mono m-4">
+    <div class="text-emerald-500 text-xs tracking-widest uppercase mb-1">Status Report</div>
+    <h3 class="text-2xl font-black text-white mb-2 tracking-tight">SUCCESS_EXEC_01</h3>
+    <p class="text-slate-400 text-xs mb-6">All structural constraints satisfied.</p>
+    
+    <button id="next-level-btn" class="w-full py-3 bg-emerald-500 text-slate-950 font-bold rounded border border-emerald-400 active:scale-[0.98] transition-all uppercase tracking-wider text-sm hover:bg-emerald-400 shadow-lg shadow-emerald-500/20 cursor-pointer">
+      [ ADV_CONFIG ]
     </button>
   </div>
 </div>
@@ -44,14 +56,19 @@
   });
 
   gameBus.on("ui:updateProgress", (data) => {
-    levelName.textContent = data.name;
-    levelDesc.textContent = data.description || "";
-    levelProgress.textContent = `${data.current} / ${data.goal}`;
-    (levelBar as HTMLDivElement).style.width = `${(data.current / data.goal) * 100}%`;
+    levelName.textContent = data.name.toUpperCase();
+    levelDesc.textContent = data.description ? data.description.toUpperCase() : "";
+    levelProgress.textContent = `${String(data.current).padStart(2, '0')} / ${String(data.goal).padStart(2, '0')}`;
+    
+    if (levelBar) {
+      (levelBar as HTMLDivElement).style.width = `${(data.current / data.goal) * 100}%`;
+    }
   });
 
   gameBus.on("ui:levelComplete", () => {
-    completeModal.classList.remove("hidden");
+    const modal = document.getElementById("level-complete-modal");
+    if(modal){
+      modal.classList.remove("hidden");
+    }
   });
-
 </script>

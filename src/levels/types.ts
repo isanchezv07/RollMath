@@ -9,6 +9,7 @@ export interface EntityBlueprint {
         angle?: number;
         speed?: number;
         radius?: number;
+        length?: number;
     };
 }
 

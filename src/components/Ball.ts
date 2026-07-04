@@ -15,10 +15,10 @@ export default class Ball {
         this.mini = mini;
 
         this.body = Bodies.circle(x, y, radius, {
-            restitution: 0.55,
-            friction: 0.02,
-            frictionAir: 0.015,
-            density: mini ? 0.002 : 0.004,
+            restitution: mini ? 0.55 : 0.45,
+            friction: 0.01,
+            frictionAir: 0.01,
+            density: mini ? 0.003 : 0.008,
             label: mini ? "mini-ball" : "ball",
             render: {
                 fillStyle: mini ? "#ef4444" : "#3b82f6",

@@ -1,0 +1,11 @@
+const Matter = require('matter-js');
+const engine = Matter.Engine.create();
+const ball = Matter.Bodies.circle(0, 0, 20, { density: 0.008 });
+console.log("Mass:", ball.mass);
+console.log("Velocity before:", ball.velocity);
+Matter.Body.applyForce(ball, ball.position, { x: 0.002, y: 0 });
+Matter.Engine.update(engine, 16.666);
+console.log("Velocity after 1 tick (force 0.002):", ball.velocity);
+Matter.Body.applyForce(ball, ball.position, { x: 0.10, y: 0 });
+Matter.Engine.update(engine, 16.666);
+console.log("Velocity after 1 tick (force 0.10):", ball.velocity);

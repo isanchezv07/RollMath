@@ -18,35 +18,32 @@
 <script>
     import MatterEngine from "../lib/MatterEngine";
     import { LevelManager } from "../lib/LevelManager";
-    import { level1 } from "../levels/level1";
-    import { level2 } from "../levels/level2";
-    import { level3 } from "../levels/level3";
-    import { level4 } from "../levels/level4";
-    import { gameBus } from "../lib/GameEventBus";
 
-    const canvas = document.getElementById("world");
+    const canvas = document.getElementById("world") as HTMLCanvasElement | null;
+
     if (canvas) {
-        const levelManager = new LevelManager([level1, level2, level3, level4]);
-        const engine = new MatterEngine(canvas as HTMLCanvasElement, levelManager);
+        const levelManager = new LevelManager();
+
+        const engine = new MatterEngine(canvas, levelManager);
         engine.start();
 
         const spawnBtn = document.getElementById("spawn");
-        if(spawnBtn) {
-            spawnBtn.addEventListener("click", async ()=>{
+        if (spawnBtn) {
+            spawnBtn.addEventListener("click", async () => {
                 await engine.gyro.start();
                 engine.spawnBall();
             });
         }
 
         const miniBtn = document.getElementById("mini");
-        if(miniBtn) {
-            miniBtn.addEventListener("click", async ()=>{
+        if (miniBtn) {
+            miniBtn.addEventListener("click", async () => {
                 await engine.gyro.start();
                 engine.spawnMiniBall();
             });
         }
 
-        window.addEventListener("resize", ()=>{
+        window.addEventListener("resize", () => {
             engine.resize();
         });
     }

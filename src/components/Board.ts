@@ -11,25 +11,35 @@ export default class Board {
     public holes: Hole[] = [];
     public obstacles: Body[] = [];
     public spinners: { body: Body, speed: number }[] = [];
-    public fans: { body: Body, angle: number, speed: number }[] = [];
+    public fans: { body: Body, angle: number, speed: number; length: number; width: number; }[] = [];
     
     constructor(entities: EntityBlueprint[]){
+        const BASE_WIDTH = 700;
+        const BASE_HEIGHT = 1000;
+        
+        const scaleX = typeof window !== "undefined" ? window.innerWidth / BASE_WIDTH : 1;
+        const scaleY = typeof window !== "undefined" ? window.innerHeight / BASE_HEIGHT : 1;
+        const scaleMin = Math.min(scaleX, scaleY);
+
         for(const blueprint of entities){
+            const x = blueprint.x * scaleX;
+            const y = blueprint.y * scaleY;
+
             switch (blueprint.type){
                 case "hole": {
                     const value = blueprint.options?.value || "0";
-                    const radius = blueprint.options?.radius || 25;
+                    const radius = (blueprint.options?.radius || 25) * scaleMin;
 
-                    const hole = new Hole(blueprint.x, blueprint.y, radius, value);
+                    const hole = new Hole(x, y, radius, value);
                     this.holes.push(hole);
                     break;
                 }
                 case "wall": {
-                    const w = blueprint.options?.width || 100;
-                    const h = blueprint.options?.height || 20;
+                    const w = (blueprint.options?.width || 100) * scaleX;
+                    const h = (blueprint.options?.height || 20) * scaleY;
                     const angle = blueprint.options?.angle || 0;
 
-                    const wallBody = Bodies.rectangle(blueprint.x, blueprint.y, w, h, {
+                    const wallBody = Bodies.rectangle(x, y, w, h, {
                         isStatic: true,
                         label: "obstacle:wall",
                         angle: angle,
@@ -40,10 +50,10 @@ export default class Board {
                 }
                 case "ramp": {
                     // A ramp is essentially a polygon (triangle)
-                    const radius = blueprint.options?.radius || 50;
+                    const radius = (blueprint.options?.radius || 50) * scaleMin;
                     const angle = blueprint.options?.angle || 0;
                     
-                    const rampBody = Bodies.polygon(blueprint.x, blueprint.y, 3, radius, {
+                    const rampBody = Bodies.polygon(x, y, 3, radius, {
                         isStatic: true,
                         angle: angle,
                         label: "obstacle:ramp",
@@ -54,11 +64,11 @@ export default class Board {
                 }
                 case "spinner": {
                     // A spinner can be a long rectangle
-                    const w = (blueprint.options?.radius || 50) * 2;
-                    const h = 15;
+                    const w = (blueprint.options?.radius || 50) * 2 * scaleMin;
+                    const h = 15 * scaleMin;
                     const speed = blueprint.options?.speed || 0.05;
                     
-                    const spinnerBody = Bodies.rectangle(blueprint.x, blueprint.y, w, h, {
+                    const spinnerBody = Bodies.rectangle(x, y, w, h, {
                         isStatic: true,
                         label: "obstacle:spinner",
                         render: { fillStyle: "#f59e0b" }
@@ -68,17 +78,29 @@ export default class Board {
                     break;
                 }
                 case "fan": {
-                    const angle = blueprint.options?.angle || 0;
-                    const speed = blueprint.options?.speed || 0.1;
-                    
-                    // Render the fan as a small circle source
-                    const fanBody = Bodies.circle(blueprint.x, blueprint.y, 20, {
+                    const angle = blueprint.options?.angle ?? 0;
+                    const speed = blueprint.options?.speed  ?? 0.00005;
+                    const length = (blueprint.options?.length ?? 250) * scaleMin;
+                    const width = (blueprint.options?.width ?? 80) * scaleMin;
+
+                    const fanRadius = 20 * scaleMin;
+
+                    const fanBody = Bodies.circle(x, y, fanRadius, {
                         isStatic: true,
                         isSensor: true,
                         label: "obstacle:fan",
-                        render: { fillStyle: "#0ea5e9" }
+                        render: {
+                            visible: false
+                        }
                     });
-                    this.fans.push({ body: fanBody, angle, speed });
+
+                    this.fans.push({
+                        body: fanBody,
+                        angle,
+                        speed,
+                        length,
+                        width
+                    });
                     this.obstacles.push(fanBody);
                     break;
                 }
